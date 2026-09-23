@@ -1,0 +1,29 @@
+---
+- name: LinuxNetOps - Automação, Configuração e Auditoria de Infraestrutura
+  hosts: all_servers
+  become: yes
+
+  tasks:
+    - name: Fase 1 - Atualizar cache de pacotes e garantir utilitários essenciais
+      ansible.builtin.apt:
+        update_cache: yes
+        state: latest
+      when: ansible_os_family == "Debian"
+
+    - name: Fase 2 - Instalar ferramentas de diagnóstico de rede e sistema
+      ansible.builtin.apt:
+        name:
+          - curl
+          - net-tools
+          - dnsutils
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Fase 3 - Gerar relatório de portas ativas para auditoria local
+      ansible.builtin.shell: "netstat -tuln > /tmp/relatorio_portas_ansible.txt"
+      args:
+        executable: /bin/bash
+
+    - name: Fase 4 - Registar conclusão com sucesso
+      ansible.builtin.debug:
+        msg: "Playbook executado com sucesso: Infraestrutura validada e auditada."
